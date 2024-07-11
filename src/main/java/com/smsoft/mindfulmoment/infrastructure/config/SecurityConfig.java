@@ -22,7 +22,7 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/", "/survey").permitAll()
-                .antMatchers("/css/**, ","/js/**", "/images/**", "/favicon.ico").permitAll()
+                .antMatchers("/favicon.ico","/css/**","/js/**", "/images/**", "/favicon.ico").permitAll()
                 .anyRequest().authenticated()
         ;
 

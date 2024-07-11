@@ -5,5 +5,5 @@ import com.smsoft.mindfulmoment.domain.question.dto.QuestionDto;
 import java.util.List;
 
 public interface QuestionRepositoryCustom {
-    List<QuestionDto> findRandomQuestionsForAllCategories();
+    List<QuestionDto> findAllQuestions();
 }

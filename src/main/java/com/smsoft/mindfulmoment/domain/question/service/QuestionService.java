@@ -15,7 +15,7 @@ public class QuestionService {
     private final QuestionRepositoryCustom questionRepositoryCustom;
     @Transactional(readOnly = true)
     public List<QuestionDto> getRandomQuestionsForAllCategories() {
-        return questionRepositoryCustom.findRandomQuestionsForAllCategories();
+        return questionRepositoryCustom.findAllQuestions();
     }
 
     @Transactional(readOnly = true)

@@ -15,7 +15,7 @@ import java.util.Map;
 public class QuestionApiController {
     private final QuestionService questionService;
 
-    @GetMapping("/random")
+    @GetMapping("/all")
     public ResponseEntity<List<QuestionDto>> getRandomQuestions() {
         List<QuestionDto> questions = questionService.getRandomQuestionsForAllCategories();
         return ResponseEntity.ok(questions);
