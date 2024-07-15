@@ -1,12 +1,6 @@
-package com.smsoft.mindfulmoment.infrastructure.persistence;
+package com.smsoft.mindfulmoment.infrastructure.persistence.question;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.smsoft.mindfulmoment.domain.question.dto.QuestionDto;
 import com.smsoft.mindfulmoment.domain.question.entity.QQuestion;
@@ -15,8 +9,6 @@ import com.smsoft.mindfulmoment.domain.question.repository.QuestionRepositoryCus
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
