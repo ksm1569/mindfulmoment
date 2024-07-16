@@ -50,7 +50,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .uniqueIdentifier(uniqueIdentifier)
                 .name(oAuth2UserInfo.getName())
                 .imageUrl(oAuth2UserInfo.getImageUrl())
-                .email(oAuth2UserInfo.getImageUrl())
+                .email(oAuth2UserInfo.getEmail())
                 .build();
 
         return userRepository.save(user);

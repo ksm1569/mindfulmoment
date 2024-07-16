@@ -1,6 +1,7 @@
 package com.smsoft.mindfulmoment.domain.user.entity;
 
 import com.smsoft.mindfulmoment.domain.common.BaseEntity;
+import com.smsoft.mindfulmoment.domain.common.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseEntity {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

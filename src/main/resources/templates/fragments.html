@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:fragment="head">
     <meta charset="UTF-8">
     <title>Common Fragments</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/common/bootstrap/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/common/common.css}">
+    <link rel="stylesheet" th:href="@{/css/login-modal.css}">
 </head>
 <body>
     <!-- Navigation bar fragment -->
@@ -20,8 +21,14 @@
                     <li class="nav-item">
                         <a class="custom-nav-link" href="/survey">자가진단</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" id="dashboardNavItem" style="display: none;">
                         <a class="custom-nav-link" href="/main">대시보드</a>
+                    </li>
+                    <li class="nav-item" id="loginNavItem">
+                        <a class="custom-nav-link" href="#" onclick="showLoginModal(); return false;">로그인</a>
+                    </li>
+                    <li class="nav-item" id="logoutNavItem" style="display: none;">
+                        <a class="custom-nav-link" href="#" onclick="logout(); return false;">로그아웃</a>
                     </li>
                 </ul>
             </div>
@@ -50,5 +57,101 @@
             </div>
         </div>
     </footer>
+
+    <!-- Login Modal fragment -->
+    <div th:fragment="loginModal">
+        <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="loginModalLabel">소셜 로그인</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <button onclick="loginWithOAuth('google')" class="btn btn-social">
+                            <img th:src="@{/images/google-login-btn.png}" alt="Google 로그인" class="social-logo">
+                        </button>
+                        <button onclick="loginWithOAuth('naver')" class="btn btn-social">
+                            <img th:src="@{/images/naver-login-btn.png}" alt="네이버 로그인" class="social-logo">
+                        </button>
+                        <button onclick="loginWithOAuth('kakao')" class="btn btn-social">
+                            <img th:src="@{/images/kakao-login-btn.png}" alt="카카오 로그인" class="social-logo">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts fragment -->
+    <div th:fragment="scripts">
+        <script th:src="@{/js/lib/bootstrap.bundle.min.js}"></script>
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                let loginModalEl = document.getElementById('loginModal');
+                let loginModal = new bootstrap.Modal(loginModalEl);
+
+                window.showLoginModal = function() {
+                    loginModal.show();
+                };
+
+                function loginWithOAuth(provider) {
+                    window.location.href = '/oauth2/authorization/' + provider;
+                }
+
+                function handleLoginSuccess() {
+                    loginModal.hide();
+                    location.reload();
+                }
+
+                function checkAuthStatus() {
+                    fetch('/api/auth/status', {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+                            updateNavbar(data.isAuthenticated);
+                        })
+                        .catch(error => {
+                            console.error("Auth check failed:", error);
+                            updateNavbar(false);
+                        });
+                }
+
+                function updateNavbar(isAuthenticated) {
+                    document.getElementById('loginNavItem').style.display = isAuthenticated ? 'none' : 'block';
+                    document.getElementById('logoutNavItem').style.display = isAuthenticated ? 'block' : 'none';
+                    document.getElementById('dashboardNavItem').style.display = isAuthenticated ? 'block' : 'none';
+                }
+
+                function logout() {
+                    fetch('/api/auth/logout', {
+                        method: 'POST',
+                        credentials: 'include'
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                updateNavbar(false);
+                                window.location.href = '/';
+                            } else {
+                                throw new Error('Logout failed');
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Logout failed:", error);
+                        });
+                }
+
+                // 초기 인증 상태 확인
+                checkAuthStatus();
+
+                // 전역 함수로 노출
+                window.loginWithOAuth = loginWithOAuth;
+                window.logout = logout;
+            });
+        </script>
+    </div>
 </body>
 </html>

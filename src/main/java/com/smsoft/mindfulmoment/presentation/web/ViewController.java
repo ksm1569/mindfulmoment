@@ -6,17 +6,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class ViewController {
     @GetMapping("/")
-    public String index() {
+    public String indexPage() {
         return "index";
     }
 
     @GetMapping("/survey")
-    public String survey() {
+    public String surveyPage() {
         return "survey";
     }
 
     @GetMapping("/main")
-    public String main() {
+    public String mainPage() {
         return "main";
     }
 }

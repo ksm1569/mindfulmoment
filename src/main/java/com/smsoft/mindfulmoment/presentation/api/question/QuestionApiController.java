@@ -1,4 +1,4 @@
-package com.smsoft.mindfulmoment.presentation.api;
+package com.smsoft.mindfulmoment.presentation.api.question;
 
 import com.smsoft.mindfulmoment.domain.question.dto.QuestionDto;
 import com.smsoft.mindfulmoment.domain.question.service.QuestionService;

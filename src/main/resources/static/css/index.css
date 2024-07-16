@@ -1,0 +1,25 @@
+.lead-group {
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+}
+.lead-group p {
+    margin-bottom: 0.25rem;
+    font-size: 2rem;
+}
+.impact-title {
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+    font-size: 3.5rem;
+}
+.impact-list li {
+    margin-bottom: 0.25rem;
+}
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
