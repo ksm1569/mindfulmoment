@@ -32,7 +32,7 @@ public class JwtService {
         String accessToken = tokenProvider.createToken(userId, accessTokenValidity);
         String refreshToken = tokenProvider.createToken(userId, refreshTokenValidity);
 
-        setCookie(response, accessToken, accessTokenValidity);
+        setCookie(response, accessToken, refreshTokenValidity);
         saveRefreshToken(userId, refreshToken, refreshTokenValidity);
     }
 

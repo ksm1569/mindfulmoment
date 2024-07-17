@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindfulMoment - 성인 ADHD 자가진단</title>
-    <link rel="stylesheet" th:href="@{/css/common/bootstrap/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/common/common.css}">
+    <th:block th:replace="fragments :: head"></th:block>
     <link rel="stylesheet" th:href="@{/css/index.css}">
 </head>
 <body>
@@ -35,7 +34,7 @@
     <div th:replace="fragments :: scripts"></div>
 
     <div th:replace="fragments :: footer"></div>
-    <script th:src="@{/js/lib/bootstrap.bundle.min.js}"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const elements = document.querySelectorAll('.fade-in-up');

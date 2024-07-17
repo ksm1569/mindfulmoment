@@ -19,7 +19,6 @@ body {
     transition: color 0.3s ease;
     text-decoration: none;
     padding: 0.5rem 1rem;
-    display: inline-block;
 }
 
 .custom-navbar-brand:hover, .custom-nav-link:hover {
@@ -120,17 +119,31 @@ body {
     box-shadow: 0 5px 4px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .custom-navbar {
-        padding: 0.5rem;
     }
 
     .custom-navbar-brand, .custom-nav-link {
-        padding: 0.5rem;
+        display: block;
+        text-align: center;
     }
 
-    .custom-btn-modern {
-        padding: 10px 20px;
-        font-size: 1.5rem;
+    .navbar-collapse {
+        text-align: center;
+    }
+
+    .navbar-nav {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .navbar-toggler {
+        margin-left: auto;
+        color: #333;
+        border-color: #333;
+    }
+
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%2833, 37, 41, 1%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
     }
 }

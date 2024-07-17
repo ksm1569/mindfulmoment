@@ -64,7 +64,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="loginModalLabel">소셜 로그인</h5>
+                        <h3 class="modal-title" id="loginModalLabel">Login</h3>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -86,70 +86,68 @@
     <!-- Scripts fragment -->
     <div th:fragment="scripts">
         <script th:src="@{/js/lib/bootstrap.bundle.min.js}"></script>
-        <script th:inline="javascript">
+        <script>
             document.addEventListener('DOMContentLoaded', function() {
-                let loginModalEl = document.getElementById('loginModal');
-                let loginModal = new bootstrap.Modal(loginModalEl);
+                function initAuth() {
+                    let loginModalEl = document.getElementById('loginModal');
+                    let loginModal = loginModalEl ? new bootstrap.Modal(loginModalEl) : null;
 
-                window.showLoginModal = function() {
-                    loginModal.show();
-                };
+                    window.showLoginModal = function() {
+                        if (loginModal) {
+                            loginModal.show();
+                        }
+                    };
 
-                function loginWithOAuth(provider) {
-                    window.location.href = '/oauth2/authorization/' + provider;
-                }
+                    window.loginWithOAuth = function(provider) {
+                        window.location.href = '/oauth2/authorization/' + provider;
+                    };
 
-                function handleLoginSuccess() {
-                    loginModal.hide();
-                    location.reload();
-                }
-
-                function checkAuthStatus() {
-                    fetch('/api/auth/status', {
-                        method: 'GET',
-                        credentials: 'include'
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log(data);
-                            updateNavbar(data.isAuthenticated);
+                    function checkAuthStatus() {
+                        fetch('/api/auth/status', {
+                            method: 'GET',
+                            credentials: 'include'
                         })
-                        .catch(error => {
-                            console.error("Auth check failed:", error);
-                            updateNavbar(false);
-                        });
-                }
-
-                function updateNavbar(isAuthenticated) {
-                    document.getElementById('loginNavItem').style.display = isAuthenticated ? 'none' : 'block';
-                    document.getElementById('logoutNavItem').style.display = isAuthenticated ? 'block' : 'none';
-                    document.getElementById('dashboardNavItem').style.display = isAuthenticated ? 'block' : 'none';
-                }
-
-                function logout() {
-                    fetch('/api/auth/logout', {
-                        method: 'POST',
-                        credentials: 'include'
-                    })
-                        .then(response => {
-                            if (response.ok) {
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                updateNavbar(data.authenticated);
+                            })
+                            .catch(error => {
+                                console.error("Auth check failed:", error);
                                 updateNavbar(false);
-                                window.location.href = '/';
-                            } else {
-                                throw new Error('Logout failed');
-                            }
+                            });
+                    }
+
+                    function updateNavbar(isAuthenticated) {
+                        document.getElementById('loginNavItem').style.display = isAuthenticated ? 'none' : 'block';
+                        document.getElementById('logoutNavItem').style.display = isAuthenticated ? 'block' : 'none';
+                        document.getElementById('dashboardNavItem').style.display = isAuthenticated ? 'block' : 'none';
+                    }
+
+                    window.logout = function() {
+                        fetch('/api/auth/logout', {
+                            method: 'POST',
+                            credentials: 'include'
                         })
-                        .catch(error => {
-                            console.error("Logout failed:", error);
-                        });
+                            .then(response => {
+                                if (response.ok) {
+                                    updateNavbar(false);
+                                    window.location.href = '/';
+                                } else {
+                                    throw new Error('Logout failed');
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Logout failed:", error);
+                            });
+                    };
+
+                    // 초기 인증 상태 확인
+                    checkAuthStatus();
                 }
 
-                // 초기 인증 상태 확인
-                checkAuthStatus();
-
-                // 전역 함수로 노출
-                window.loginWithOAuth = loginWithOAuth;
-                window.logout = logout;
+                // 인증 초기화 실행
+                initAuth();
             });
         </script>
     </div>

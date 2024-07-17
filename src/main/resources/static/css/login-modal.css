@@ -1,5 +1,8 @@
+.modal-header {
+    padding: 0.7rem 0.7rem;
+}
+
 .modal-body {
-    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -9,17 +12,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 250px; /* 버튼의 너비를 고정 */
-    height: 50px; /* 버튼의 높이를 고정 */
-    margin-bottom: 15px;
+    width: 220px;
+    height: 45px;
+    margin-bottom: 2px;
     border: none;
     background: none;
     padding: 0;
     overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .social-logo {
-    width: 240px;
+    width: 183px;
     height: 45px;
     object-fit: contain;
     object-position: center;
@@ -28,9 +32,9 @@
 .btn-social:hover {
     transform: translateY(-2px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
 }
 
 .modal-dialog {
     max-width: 300px;
+    margin: 1.75rem auto;
 }

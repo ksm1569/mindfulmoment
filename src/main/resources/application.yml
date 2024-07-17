@@ -60,8 +60,8 @@ spring:
 app:
   auth:
     tokenSecret: ENC(7To1Fbo1UpwEobXPhG5RR7DqfgVXotb/ovlPZFC0S6iuJaODA78HEr5u/r6g0cNnriz9nHCDqpw=)
-    accessTokenExpiration: 7200
-    refreshTokenExpiration: 86400
+    accessTokenExpiration: 10800000 # 1000(ms) x 60(s) x 60(m) x 3(h) -> 3hour
+    refreshTokenExpiration: 86400000 # 1000(ms) x 60(s) x 60(m) x 24(h) -> 24hour
 
   oauth2:
     authorizedRedirectUris:
