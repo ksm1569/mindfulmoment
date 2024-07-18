@@ -1,11 +1,13 @@
 package com.smsoft.mindfulmoment.domain.question.entity;
 
+import com.smsoft.mindfulmoment.domain.adhdscore.dto.SurveyAnswerDto;
 import com.smsoft.mindfulmoment.domain.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,4 +23,11 @@ public class QuestionCategory extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String code;
+
+    public int calculateCategoryScore(List<SurveyAnswerDto> answers) {
+        return answers.stream()
+                .filter(answer -> this.code.equals(answer.getCategory()))
+                .mapToInt(SurveyAnswerDto::getAnswerValue)
+                .sum();
+    }
 }

@@ -5,105 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindfulMoment - ADHD 설문조사</title>
     <th:block th:replace="fragments :: head"></th:block>
-    <style>
-        body {
-            padding-top: 60px;
-        }
-
-        .carousel-control-prev, .carousel-control-next {
-            width: 10%;
-            opacity: 1;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .carousel-control-prev {
-            left: -100px;
-        }
-
-        .carousel-control-next {
-            right: -100px;
-        }
-
-        .carousel-control-prev-icon, .carousel-control-next-icon {
-            background-color: rgba(0, 123, 255, 0.6);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-        }
-
-        .question-row {
-            display: flex;
-            flex-wrap: wrap;
-        }
-
-        .question-col {
-            flex: 0 0 50%;
-            max-width: 50%;
-            padding: 10px;
-        }
-
-        .custom-question-card {
-            height: 338px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .question-text {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .form-check {
-            margin-bottom: 3px;
-        }
-
-        .modal-dialog {
-            display: flex;
-            align-items: center;
-            min-height: calc(100% - 1rem);
-        }
-
-        @media (max-width: 768px) {
-            .question-col {
-                flex: 0 0 100%;
-                max-width: 100%;
-            }
-
-            .custom-question-card {
-                height: auto;
-                max-height: 325px;
-            }
-        }
-
-        .modal-footer .btn {
-            padding: 10px 20px;
-            font-size: 1.5rem;
-            min-width: 100px;
-        }
-
-        .modal-content {
-            font-size: 2rem;
-            max-width: 500px;
-            background-color: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(5px);
-        }
-
-        #warningModal .modal-content {
-            background-color: rgba(255, 220, 220, 0.6);
-        }
-
-        .modal-header {
-            border-bottom: none;
-        }
-
-        .modal-footer {
-            border-top: none;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/survey.css}">
 </head>
 <body>
     <div th:replace="fragments :: navbar"></div>
@@ -112,8 +14,6 @@
         <h1 class="text-center mb-4">자가진단지</h1>
         <div id="questionCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="false">
             <div class="carousel-inner">
-                <form id="survey-form">
-                </form>
             </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#questionCarousel" data-bs-slide="prev" id="prevButton">
@@ -187,7 +87,6 @@
     <div th:replace="fragments :: scripts"></div>
     <div th:replace="fragments :: footer"></div>
 
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const prevButton = document.getElementById('prevButton');
@@ -205,53 +104,56 @@
             });
 
             fetch('/api/questions/all')
-                .then(response => response.json())
-                .then(questions => {
-                    const carousel = document.querySelector('.carousel-inner');
-                    const categories = ['ATTENTION', 'HYPERACTIVITY', 'IMPULSIVITY', 'ORGANIZATION'];
-                    let pageCount = 0;
-                    let questionNumber = 1;
+            .then(response => response.json())
+            .then(questions => {
+                const carousel = document.querySelector('.carousel-inner');
+                const categories = ['ATTENTION', 'HYPERACTIVITY', 'IMPULSIVITY', 'ORGANIZATION'];
+                let questionNumber = 1;
+                let pageCount = 0;
 
-                    categories.forEach((category, categoryIndex) => {
-                        const categoryQuestions = questions.filter(q => q.category === category).slice(0, 4);
-                        const slide = document.createElement('div');
-                        slide.className = `carousel-item ${pageCount === 0 ? 'active' : ''}`;
-                        let slideContent = `<div class="question-row">`;
-                        categoryQuestions.forEach((question, index) => {
-                            slideContent += `
-                                <div class="question-col">
-                                    <div class="custom-question-card">
-                                        <p class="question-text"><span class="custom-question-number">Q${questionNumber}.</span> ${question.text}</p>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="q${question.id}" id="q${question.id}_0" value="0" required>
-                                            <label class="form-check-label" for="q${question.id}_0">전혀 그렇지 않다</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="q${question.id}" id="q${question.id}_1" value="1">
-                                            <label class="form-check-label" for="q${question.id}_1">가끔 그렇다</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="q${question.id}" id="q${question.id}_2" value="2">
-                                            <label class="form-check-label" for="q${question.id}_2">자주 그렇다</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="q${question.id}" id="q${question.id}_3" value="3">
-                                            <label class="form-check-label" for="q${question.id}_3">매우 자주 그렇다</label>
-                                        </div>
+                categories.forEach((category, categoryIndex) => {
+                    const categoryQuestions = questions.filter(q => q.category === category).slice(0, 4);
+                    const slide = document.createElement('div');
+                    slide.className = `carousel-item ${pageCount === 0 ? 'active' : ''}`;
+                    let slideContent = `<form id="survey-form-${category}" class="category-form" data-category="${category}">`;
+                    slideContent += '<div class="question-container">';
+
+                    categoryQuestions.forEach((question, index) => {
+                        slideContent += `
+                            <div class="question-col">
+                                <div class="custom-question-card" data-question-id="${question.id}">
+                                    <p class="question-text"><span class="custom-question-number">Q${questionNumber}.</span> ${question.text}</p>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="question_${question.id}" value="0" required>
+                                        <label class="form-check-label">전혀 그렇지 않다</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="question_${question.id}" value="1">
+                                        <label class="form-check-label">가끔 그렇다</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="question_${question.id}" value="2">
+                                        <label class="form-check-label">자주 그렇다</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="question_${question.id}" value="3">
+                                        <label class="form-check-label">매우 자주 그렇다</label>
                                     </div>
                                 </div>
-                                `;
-                            questionNumber++;
-                        });
-                        slideContent += `</div>`;
-                        slide.innerHTML = slideContent;
-                        carousel.appendChild(slide);
-                        pageCount++;
+                            </div>
+                        `;
+                        questionNumber++;
                     });
 
-                    document.getElementById('totalPages').textContent = pageCount;
-                    updateCurrentPage();
+                    slideContent += '</div></form>';
+                    slide.innerHTML = slideContent;
+                    carousel.appendChild(slide);
+                    pageCount++;
                 });
+
+                document.getElementById('totalPages').textContent = pageCount;
+                updateCurrentPage();
+            });
 
             const carouselElement = document.getElementById('questionCarousel');
             const carousel = new bootstrap.Carousel(carouselElement, {
@@ -265,8 +167,7 @@
 
             function updateCurrentPage() {
                 const activeSlide = document.querySelector('.carousel-item.active');
-                const currentPage = Array.from(activeSlide.parentNode.children).indexOf(activeSlide);
-                document.getElementById('currentPage').textContent = currentPage;
+                document.getElementById('currentPage').textContent = Array.from(activeSlide.parentNode.children).indexOf(activeSlide) + 1;
             }
 
             function updateButtonStates() {
@@ -294,7 +195,7 @@
                 const totalPages = parseInt(document.getElementById('totalPages').textContent);
 
                 if (checkCurrentPageAnswered() && currentPage < totalPages) {
-                    setTimeout(() => carousel.next(), 500); // 0.5초 후 다음 페이지로 이동
+                    setTimeout(() => carousel.next(), 100);
                 } else if (currentPage === totalPages) {
                     checkAllAnswered();
                 }
@@ -322,7 +223,6 @@
                 }
             }
 
-
             function checkAllQuestionsAnswered() {
                 const questions = document.querySelectorAll('.custom-question-card');
                 for (let question of questions) {
@@ -342,6 +242,53 @@
                     event.preventDefault();
                     showSubmitModal();
                 }
+            });
+
+            document.getElementById('confirmSubmit').addEventListener('click', function() {
+                submitConfirmModal.hide();
+                //loadingModal.show();
+
+                const answers = [];
+                const categoryForms = document.querySelectorAll('.category-form');
+
+                categoryForms.forEach(form => {
+                    const category = form.dataset.category;
+                    const questionCards = form.querySelectorAll('.custom-question-card');
+
+                    questionCards.forEach(card => {
+                        const questionId = card.dataset.questionId;
+                        const checkedRadio = card.querySelector('input[type="radio"]:checked');
+
+                        if (checkedRadio) {
+                            const answerValue = parseInt(checkedRadio.value);
+
+                            answers.push({
+                                questionId: questionId,
+                                answerValue: answerValue,
+                                category: category
+                            });
+                        }
+                    });
+                });
+
+                fetch('/api/adhd-score/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ answers: answers })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    //loadingModal.hide();
+                    displayResults(data);
+                    resultModal.show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loadingModal.hide();
+                    alert('결과 계산 중 오류가 발생했습니다. 다시 시도해주세요.');
+                });
             });
         });
     </script>

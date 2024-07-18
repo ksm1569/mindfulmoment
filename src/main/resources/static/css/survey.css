@@ -1,0 +1,98 @@
+body {
+    padding-top: 60px;
+}
+
+.carousel-control-prev, .carousel-control-next {
+    width: 10%;
+    opacity: 1;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.carousel-control-prev {
+    left: -100px;
+}
+
+.carousel-control-next {
+    right: -100px;
+}
+
+.carousel-control-prev-icon, .carousel-control-next-icon {
+    background-color: rgba(0, 123, 255, 0.6);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+.question-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.question-col {
+    flex: 0 0 48%; /* 약간의 여백을 위해 48%로 설정 */
+    max-width: 48%;
+    margin-bottom: 20px;
+}
+
+.custom-question-card {
+    height: 100%;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.question-text {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.form-check {
+    margin-bottom: 5px;
+}
+
+.modal-dialog {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
+@media (max-width: 768px) {
+    .question-col {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .custom-question-card {
+        height: auto;
+    }
+}
+
+.modal-footer .btn {
+    padding: 10px 20px;
+    font-size: 1.5rem;
+    min-width: 100px;
+}
+
+#warningModal .modal-content {
+    background-color: rgba(255, 220, 220, 0.6);
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.category-form {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.carousel-item {
+    padding: 20px 0;
+}
