@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -34,6 +35,15 @@ public class JwtService {
 
         setCookie(response, accessToken, refreshTokenValidity);
         saveRefreshToken(userId, refreshToken, refreshTokenValidity);
+    }
+
+    public boolean validateAndRefreshTokenIfNeeded(Long userId, HttpServletResponse response) {
+        Optional<String> refreshTokenOpt = userService.getRefreshTokenForUser(userId);
+        if (refreshTokenOpt.isPresent() && tokenProvider.validateToken(refreshTokenOpt.get())) {
+            createAndSetTokens(userId, response);
+            return true;
+        }
+        return false;
     }
 
     private void setCookie(HttpServletResponse response, String token, long tokenValidity) {

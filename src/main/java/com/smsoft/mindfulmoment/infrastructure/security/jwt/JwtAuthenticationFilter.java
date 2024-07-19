@@ -1,11 +1,14 @@
 package com.smsoft.mindfulmoment.infrastructure.security.jwt;
 
 import com.smsoft.mindfulmoment.common.util.CookieUtils;
+import com.smsoft.mindfulmoment.domain.common.exception.BusinessException;
+import com.smsoft.mindfulmoment.domain.user.exception.AuthenticationException;
 import com.smsoft.mindfulmoment.domain.user.service.UserService;
 import com.smsoft.mindfulmoment.infrastructure.security.userdetails.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,10 +30,8 @@ import java.util.Optional;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider tokenProvider;
     private final JwtService jwtService;
     private final CustomUserDetailsService customUserDetailsService;
-    private final UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -38,34 +39,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = getTokenFromRequest(request).orElse(null);
             if (token != null) {
-                Long userId = tokenProvider.getUserIdFromJWT(token);
-                if (tokenProvider.validateToken(token)) {
+                if (jwtService.validateToken(token)) {
+                    Long userId = jwtService.getUserIdFromToken(token);
                     setAuthenticationToContext(userId, request);
+                } else {
+                    throw new AuthenticationException();
                 }
             }
         } catch (ExpiredJwtException ex) {
             handleExpiredToken(request, response, ex);
+        } catch (AuthenticationException ex) {
+            log.error("Authentication failed: {}", ex.getMessage());
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Authentication failed");
+        } catch (BusinessException ex) {
+            log.error("Business exception occurred: {}", ex.getMessage());
+            sendErrorResponse(response, HttpStatus.BAD_REQUEST, ex.getMessage());
+            return;
         } catch (Exception ex) {
-            log.error("Could not set user authentication in security context", ex);
+            log.error("Unexpected error occurred during authentication", ex);
+            sendErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+            return;
         }
         filterChain.doFilter(request, response);
     }
 
-    private void handleExpiredToken(HttpServletRequest request, HttpServletResponse response, ExpiredJwtException ex) {
+    private void handleExpiredToken(HttpServletRequest request, HttpServletResponse response, ExpiredJwtException ex) throws IOException {
         try {
             Long userId = Long.parseLong(ex.getClaims().getSubject());
-            Optional<String> refreshToken = userService.getRefreshTokenForUser(userId);
-
-            if (refreshToken.isPresent() && tokenProvider.validateToken(refreshToken.get())) {
-                jwtService.createAndSetTokens(userId, response);
+            if (jwtService.validateAndRefreshTokenIfNeeded(userId, response)) {
                 setAuthenticationToContext(userId, request);
-
                 log.debug("Access token refreshed successfully for user: {}", userId);
             } else {
                 log.debug("Invalid refresh token. User needs to re-authenticate.");
+                sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token expired and couldn't be refreshed");
             }
         } catch (Exception e) {
             log.error("Error while handling expired token", e);
+            sendErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, "Error processing authentication");
         }
     }
     private Optional<String> getTokenFromRequest(HttpServletRequest request) {
@@ -82,6 +92,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        String json = String.format("{\"error\":\"%s\",\"message\":\"%s\"}", status.getReasonPhrase(), message);
+        response.getWriter().write(json);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.smsoft.mindfulmoment.infrastructure.security.oauth2;
 
-import com.smsoft.mindfulmoment.common.exception.OAuth2AuthenticationProcessingException;
+import com.smsoft.mindfulmoment.domain.user.exception.OAuth2AuthenticationProcessingException;
 import com.smsoft.mindfulmoment.domain.user.entity.AuthProvider;
 import com.smsoft.mindfulmoment.infrastructure.security.oauth2.user.GoogleOAuth2UserInfo;
 import com.smsoft.mindfulmoment.infrastructure.security.oauth2.user.KakaoOAuth2UserInfo;

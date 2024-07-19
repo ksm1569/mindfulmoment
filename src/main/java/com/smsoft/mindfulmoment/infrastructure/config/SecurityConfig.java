@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/", "/survey", "/oauth2/**").permitAll()
                 .antMatchers("/api/auth/status").permitAll()
-                .antMatchers("/api/questions/all", "/api/questions/submit").permitAll()
+                .antMatchers("/api/questions/all", "/api/adhd-survey/calculate").permitAll()
                 .antMatchers("/favicon.ico","/css/**","/js/**", "/images/**", "/favicon.ico").permitAll()
                 .anyRequest().authenticated()
             .and()

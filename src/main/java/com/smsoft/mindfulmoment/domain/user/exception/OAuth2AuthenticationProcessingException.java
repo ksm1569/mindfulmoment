@@ -1,4 +1,4 @@
-package com.smsoft.mindfulmoment.common.exception;
+package com.smsoft.mindfulmoment.domain.user.exception;
 
 import org.springframework.security.core.AuthenticationException;
 

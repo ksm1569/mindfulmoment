@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class CategoryScoreCalculator {
+public class CategoryScoreCalculatorService {
     private final QuestionCategoryRepository questionCategoryRepository;
 
     public Map<String, Integer> calculateCategoryScores(List<SurveyAnswerDto> answers) {

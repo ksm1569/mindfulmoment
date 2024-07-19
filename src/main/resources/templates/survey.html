@@ -271,8 +271,9 @@
                     });
                 });
 
-                fetch('/api/adhd-score/calculate', {
+                fetch('/api/adhd-survey/calculate', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -280,6 +281,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);
                     //loadingModal.hide();
                     displayResults(data);
                     resultModal.show();

@@ -4,6 +4,8 @@ import com.smsoft.mindfulmoment.domain.adhdscore.dto.AdhdSurveyCalculationReques
 import com.smsoft.mindfulmoment.domain.adhdscore.dto.AdhdSurveyCalculationResponseDto;
 import com.smsoft.mindfulmoment.domain.adhdscore.entity.AdhdScore;
 import com.smsoft.mindfulmoment.domain.adhdscore.repository.AdhdScoreRepository;
+import com.smsoft.mindfulmoment.domain.common.exception.BusinessException;
+import com.smsoft.mindfulmoment.domain.common.exception.ErrorCode;
 import com.smsoft.mindfulmoment.domain.user.entity.User;
 import com.smsoft.mindfulmoment.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +17,13 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class AdhdScoreService {
-    private final CategoryScoreCalculator categoryScoreCalculator;
+    private final CategoryScoreCalculatorService categoryScoreCalculatorService;
     private final AdhdScoreRepository adhdScoreRepository;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public AdhdSurveyCalculationResponseDto calculateAdhdScore(AdhdSurveyCalculationRequestDto request) {
-        Map<String, Integer> categoryScores = categoryScoreCalculator.calculateCategoryScores(request.getAnswers());
+        Map<String, Integer> categoryScores = categoryScoreCalculatorService.calculateCategoryScores(request.getAnswers());
 
         AdhdScore adhdScore = AdhdScore.builder()
                 .attentionDeficitScore(categoryScores.get("ATTENTION"))
@@ -36,9 +38,9 @@ public class AdhdScoreService {
     @Transactional
     public void saveUserAnswersAndScore(Long userId, AdhdSurveyCalculationRequestDto request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found")); // UserNotFoundException 추가필요
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_EXISTS));
 
-        Map<String, Integer> categoryScores = categoryScoreCalculator.calculateCategoryScores(request.getAnswers());
+        Map<String, Integer> categoryScores = categoryScoreCalculatorService.calculateCategoryScores(request.getAnswers());
 
         AdhdScore adhdScore = AdhdScore.builder()
                 .user(user)
