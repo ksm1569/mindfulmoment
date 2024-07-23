@@ -65,19 +65,77 @@
         </div>
     </div>
 
+    <!-- Result Modal -->
     <div class="modal fade" id="resultModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">설문 결과</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h3 class="modal-title">ADHD 설문 결과</h3>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>당신의 ADHD 위험도 점수는 <span id="adhd-score"></span>점입니다.</p>
-                    <p id="risk-level"></p>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center">
+                                    <h4 class="card-title">총점</h4>
+                                    <h2 class="display-4 text-primary" id="totalScore"></h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center">
+                                    <h4 class="card-title">수준</h4>
+                                    <h2 class="display-4" id="adhdLevel"></h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <canvas id="indicatorChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <div class="text-center p-2 rounded bg-success text-white flex-grow-1 mx-1">
+                                    <h6>정상</h6>
+                                    <small>0-25</small>
+                                </div>
+                                <div class="text-center p-2 rounded bg-warning text-dark flex-grow-1 mx-1">
+                                    <h6>경고</h6>
+                                    <small>26-50</small>
+                                </div>
+                                <div class="text-center p-2 rounded bg-orange text-white flex-grow-1 mx-1">
+                                    <h6>위험</h6>
+                                    <small>51-75</small>
+                                </div>
+                                <div class="text-center p-2 rounded bg-danger text-white flex-grow-1 mx-1">
+                                    <h6>전문가 상담 필요</h6>
+                                    <small>76-100</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="/main" class="btn custom-btn-primary">개선하기</a>
+                    <button id="kakaoShareBtn" class="btn btn-warning">
+                        <img th:src="@{/icons/icon-kakao.png}" alt="Kakao" style="width: 20px; height: 20px; margin-right: 5px;">
+                        공유하기
+                    </button>
+                    <a href="/main" class="btn btn-primary">개선하기</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 </div>
             </div>
         </div>
@@ -87,6 +145,7 @@
     <div th:replace="fragments :: scripts"></div>
     <div th:replace="fragments :: footer"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const prevButton = document.getElementById('prevButton');
@@ -94,6 +153,8 @@
             const carouselInner = document.querySelector('.carousel-inner');
             const submitConfirmModal = new bootstrap.Modal(document.getElementById('submitConfirmModal'));
             const warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
+            const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+            let currentData = null;
 
             prevButton.style.display = 'none';
 
@@ -246,7 +307,6 @@
 
             document.getElementById('confirmSubmit').addEventListener('click', function() {
                 submitConfirmModal.hide();
-                //loadingModal.show();
 
                 const answers = [];
                 const categoryForms = document.querySelectorAll('.category-form');
@@ -281,17 +341,144 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
-                    //loadingModal.hide();
-                    displayResults(data);
+                    currentData = data;
                     resultModal.show();
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    loadingModal.hide();
                     alert('결과 계산 중 오류가 발생했습니다. 다시 시도해주세요.');
                 });
             });
+
+            document.getElementById('resultModal').addEventListener('shown.bs.modal', function () {
+                if (currentData) {
+                    displayResults(currentData);
+                }
+            });
+
+            function displayResults(data) {
+                const totalScore = data.totalScore;
+                let adhdLevel;
+                let levelColor;
+
+                if (totalScore <= 25) {
+                    adhdLevel = "정상";
+                    levelColor = "text-success";
+                } else if (totalScore <= 50) {
+                    adhdLevel = "경고";
+                    levelColor = "text-warning";
+                } else if (totalScore <= 75) {
+                    adhdLevel = "위험";
+                    levelColor = "text-orange";
+                } else {
+                    adhdLevel = "전문가 상담 필요";
+                    levelColor = "text-danger";
+                }
+
+                const totalScoreElement = document.getElementById('totalScore');
+                const adhdLevelElement = document.getElementById('adhdLevel');
+
+                totalScoreElement.textContent = totalScore;
+                adhdLevelElement.textContent = adhdLevel;
+                totalScoreElement.className = `display-4 ${levelColor}`;
+                adhdLevelElement.className = `display-4 ${levelColor}`;
+
+                const commonOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false
+                };
+
+                const categoryCtx = document.getElementById('categoryChart');
+                const indicatorCtx = document.getElementById('indicatorChart');
+
+                if (!categoryCtx || !indicatorCtx) {
+                    console.error('Chart canvases not found');
+                    return;
+                }
+
+                new Chart(categoryCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['주의력 결핍', '과잉행동', '충동성', '조직화'],
+                        datasets: [{
+                            label: '카테고리 점수',
+                            data: [data.attentionDeficitScore, data.hyperactivityScore, data.impulsivityScore, data.organizationScore],
+                            backgroundColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(54, 162, 235)',
+                                'rgb(255, 206, 86)',
+                                'rgb(75, 192, 192)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        ...commonOptions,
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100
+                            },
+                            y: {
+                                ticks: {
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                new Chart(indicatorCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['차분함', '집중력', '시간 관리', '의사 결정', '감정 조절', '과제 완수'],
+                        datasets: [{
+                            label: '지표 점수',
+                            data: [data.calmness, data.concentration, data.timeManagement, data.decisionMaking, data.emotionalControl, data.taskCompletion],
+                            fill: true,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            pointBackgroundColor: 'rgb(54, 162, 235)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(54, 162, 235)'
+                        }]
+                    },
+                    options: {
+                        ...commonOptions,
+                        elements: {
+                            line: {
+                                borderWidth: 3
+                            }
+                        },
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    display: false
+                                },
+                                suggestedMin: 0,
+                                suggestedMax: 100,
+                                pointLabels: {
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         });
     </script>
 </body>

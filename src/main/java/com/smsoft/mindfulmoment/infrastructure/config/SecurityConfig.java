@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .antMatchers("/", "/survey", "/oauth2/**").permitAll()
                 .antMatchers("/api/auth/status").permitAll()
                 .antMatchers("/api/questions/all", "/api/adhd-survey/calculate").permitAll()
-                .antMatchers("/favicon.ico","/css/**","/js/**", "/images/**", "/favicon.ico").permitAll()
+                .antMatchers("/favicon.ico","/css/**","/js/**", "/images/**", "/icons/**", "/favicon.ico").permitAll()
                 .anyRequest().authenticated()
             .and()
                 .oauth2Login()
