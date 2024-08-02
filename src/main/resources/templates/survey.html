@@ -71,7 +71,6 @@
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h3 class="modal-title">ADHD 설문 결과</h3>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row mb-4">
@@ -134,6 +133,7 @@
                         <img th:src="@{/icons/icon-kakao.png}" alt="Kakao" style="width: 20px; height: 20px; margin-right: 5px;">
                         공유하기
                     </button>
+                    <button id="saveResultBtn" class="btn btn-primary" style="display: none;" onclick="showLoginModal();">결과저장</button>
                     <a href="/main" class="btn btn-primary">개선하기</a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 </div>
@@ -308,7 +308,66 @@
             document.getElementById('confirmSubmit').addEventListener('click', function() {
                 submitConfirmModal.hide();
 
+                const answers = gatherAnswers();
+
+                console.log("answers", answers);
+
+                fetch('/api/adhd-survey/calculate', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ answers: answers })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    currentData = data;
+                    resultModal.show();
+                    checkAuthStatus().then(authenticated => {
+                        console.log(authenticated);
+                        if (authenticated) {
+                            saveResultsAutomatically(answers);
+                        } else {
+                            showSaveResultButton();
+                        }
+                    });
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('결과 계산 중 오류가 발생했습니다. 다시 시도해주세요.');
+                });
+            });
+
+            function saveResultsAutomatically(answers) {
+                fetch('/api/adhd-survey/save', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ answers: answers })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Results saved:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error saving results:', error);
+                    });
+            }
+
+            function showSaveResultButton() {
+                const saveButton = document.getElementById('saveResultBtn');
+                if (saveButton) {
+                    saveButton.style.display = 'inline-block';
+                }
+            }
+
+            function gatherAnswers() {
                 const answers = [];
+
                 const categoryForms = document.querySelectorAll('.category-form');
 
                 categoryForms.forEach(form => {
@@ -330,25 +389,8 @@
                         }
                     });
                 });
-
-                fetch('/api/adhd-survey/calculate', {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ answers: answers })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    currentData = data;
-                    resultModal.show();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('결과 계산 중 오류가 발생했습니다. 다시 시도해주세요.');
-                });
-            });
+                return answers;
+            }
 
             document.getElementById('resultModal').addEventListener('shown.bs.modal', function () {
                 if (currentData) {
@@ -478,6 +520,8 @@
                         }
                     }
                 });
+
+
             }
         });
     </script>

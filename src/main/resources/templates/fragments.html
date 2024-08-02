@@ -87,7 +87,7 @@
     <div th:fragment="scripts">
         <script th:src="@{/js/lib/bootstrap.bundle.min.js}"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            (function() {
                 function initAuth() {
                     let loginModalEl = document.getElementById('loginModal');
                     let loginModal = loginModalEl ? new bootstrap.Modal(loginModalEl) : null;
@@ -103,19 +103,20 @@
                     };
 
                     function checkAuthStatus() {
-                        fetch('/api/auth/status', {
+                        return fetch('/api/auth/status', {
                             method: 'GET',
                             credentials: 'include'
                         })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log(data);
-                                updateNavbar(data.authenticated);
-                            })
-                            .catch(error => {
-                                console.error("Auth check failed:", error);
-                                updateNavbar(false);
-                            });
+                        .then(response => response.json())
+                        .then(data => {
+                            updateNavbar(data.authenticated);
+                            return data.authenticated;
+                        })
+                        .catch(error => {
+                            console.error("Auth check failed:", error);
+                            updateNavbar(false);
+                            return false;
+                        });
                     }
 
                     function updateNavbar(isAuthenticated) {
@@ -129,26 +130,25 @@
                             method: 'POST',
                             credentials: 'include'
                         })
-                            .then(response => {
-                                if (response.ok) {
-                                    updateNavbar(false);
-                                    window.location.href = '/';
-                                } else {
-                                    throw new Error('Logout failed');
-                                }
-                            })
-                            .catch(error => {
-                                console.error("Logout failed:", error);
-                            });
+                        .then(response => {
+                            if (response.ok) {
+                                updateNavbar(false);
+                                window.location.href = '/';
+                            } else {
+                                throw new Error('Logout failed');
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Logout failed:", error);
+                        });
                     };
 
-                    // 초기 인증 상태 확인
+                    window.checkAuthStatus = checkAuthStatus;
                     checkAuthStatus();
                 }
 
-                // 인증 초기화 실행
                 initAuth();
-            });
+            })();
         </script>
     </div>
 </body>

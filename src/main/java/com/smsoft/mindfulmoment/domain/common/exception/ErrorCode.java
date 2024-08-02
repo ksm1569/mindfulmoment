@@ -19,6 +19,7 @@ public enum ErrorCode {
 
     // ADHD Score
     ADHD_SCORE_NOT_EXISTS(HttpStatus.BAD_REQUEST, "AD001", "Invalid ADHD score information"),
+    SURVEY_ALREADY_SUBMITTED(HttpStatus.CONFLICT, "AD002", "Survey has already been submitted"),
 
     // Question
     QUESTION_NOT_EXISTS(HttpStatus.BAD_REQUEST, "Q001", "Invalid question information");

@@ -49,6 +49,17 @@ public class AdhdScore extends BaseTimeEntity {
         calculateIndicators();
     }
 
+    public static AdhdScore create(User user, Integer attentionDeficitScore, Integer hyperactivityScore,
+                                   Integer impulsivityScore, Integer organizationScore) {
+        return AdhdScore.builder()
+                .user(user)
+                .attentionDeficitScore(attentionDeficitScore)
+                .hyperactivityScore(hyperactivityScore)
+                .impulsivityScore(impulsivityScore)
+                .organizationScore(organizationScore)
+                .build();
+    }
+
     private Integer calculateTotalScore() {
         return attentionDeficitScore + hyperactivityScore + impulsivityScore + organizationScore;
     }

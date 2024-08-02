@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface AdhdScoreRepository extends JpaRepository<AdhdScore, Long> {
     Optional<AdhdScore> findByUser(User user);
+    boolean existsByUser(User user);
 }
